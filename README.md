@@ -1,8 +1,11 @@
 # create-project
+Create new project folder in WSL, initialize git and upload to GitHub.
+## Setup
 To make the script available everywhere add to ~/.bashrc:
-
     export PATH=$PATH$( find ~/Dev/Automation/ -type d -printf ":%p" )
 
-Call:
+## Call from WSL:
+    create_project.sh
 
-    create_project.sh my-new-project
+## Call from Windows:
+Run create_project.ps1 with PowerShell
