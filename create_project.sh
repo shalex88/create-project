@@ -23,20 +23,23 @@ function push_to_github()
 function create_project()
 {
     echo -e "${YELLOW}Create project${NC}"
-    cd ~/Dev
+
+    if [ $# -eq 0 ]; then
+        echo -e "Provide a project name:"
+        read project_name
+    else
+        project_name=$1
+    fi
+
+    echo -e "Provide a project path:"
+    read -e -p "" path_to_repo
+    cd $path_to_repo
     mkdir $project_name
     cd $project_name
 }
 
 YELLOW='\033[0;33m'
 NC='\033[0m'
-
-if [ $# -eq 0 ]; then
-    echo -e "${YELLOW}Provide a project name:${NC}"
-    read project_name
-else
-    project_name=$1
-fi
 
 create_project
 init_git
