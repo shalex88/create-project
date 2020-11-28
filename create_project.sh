@@ -22,8 +22,7 @@ function push_to_github()
 function create_project()
 {
     echo -e "${YELLOW}Create project${NC}"
-
-    if [ $# -eq 0 ]; then
+    if [ -z "$1" ]; then
         echo -e "Provide a project name:"
         read project_name
     else
@@ -57,7 +56,7 @@ function access_github()
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
-create_project
+create_project "$1"
 access_github
 init_git
 push_to_github
