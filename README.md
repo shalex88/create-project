@@ -1,8 +1,9 @@
 # create-project
 Create new project folder in WSL, initialize git and upload to GitHub.
 ## Setup
-To make the script available everywhere add to ~/.bashrc:
-    export PATH=$PATH$( find ~/Dev/Automation/ -type d -printf ":%p" )
+- Create personal access token for GitHub authentication.
+- To make the script available everywhere add to ~/.bashrc:  
+export PATH=$PATH$( find ~/Dev/Automation/ -type d -printf ":%p" )
 
 ## Call from WSL:
     create_project.sh
