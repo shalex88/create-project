@@ -1,11 +1,13 @@
 # create-project
-Create new project folder in WSL, initialize git and upload to GitHub.
+- Create new project directory
+- Initialize git
+- Upload to GitHub
 ## Setup
-- Create personal access token for GitHub authentication.
+- Create personal access token for GitHub authentication. GitHub > Settings > Developer settings > Personal access tokens
 - To make the script available everywhere add to ~/.bashrc:  
 export PATH=$PATH$( find ~/Dev/Automation/ -type d -printf ":%p" )
 
-## Call from WSL:
+## Call from Linux:
     create_project.sh
 
 ## Call from Windows:
