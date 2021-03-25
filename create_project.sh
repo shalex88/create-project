@@ -39,6 +39,60 @@ function push_to_github()
     git push -u origin main dev
 }
 
+function c()
+{
+    mkdir src
+    mkdir inc
+
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
+        'project('$project_name' C)'\
+        '' \
+        'set(CMAKE_C_STANDARD 11)' \
+        '' \
+        'include_directories(inc)' \
+        'file(GLOB_RECURSE SOURCES "src/*.c")' \
+        'file(GLOB_RECURSE INCLUDES "inc/*.h")' \
+        '' \
+        'add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})' \
+        > CMakeLists.txt
+
+    printf '%s\n' '#include <stdio.h>'\
+        '' \
+        'int main() {' \
+        '    printf("Hello, World!\n");' \
+        '    return 0;' \
+        '}' \
+        > src/main.c
+}
+
+function cpp()
+{
+    mkdir src
+    mkdir inc
+
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
+        'project('$project_name')'\
+        '' \
+        'set(CMAKE_CXX_STANDARD 20)' \
+        '' \
+        'include_directories(inc)' \
+        'file(GLOB_RECURSE SOURCES "src/*.cpp")' \
+        'file(GLOB_RECURSE INCLUDES "inc/*.h")' \
+        '' \
+        'add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})' \
+        > CMakeLists.txt
+
+    printf '%s\n' '#include <iostream>'\
+        '' \
+        'int main() {' \
+        '    std::cout << "Hello, World!" << std::endl;' \
+        '    return 0;' \
+        '}' \
+        > src/main.cpp
+}
+
 function create_project()
 {
     echo -e "${YELLOW}Creating project${NC}"
@@ -47,6 +101,10 @@ function create_project()
     mkdir $project_name
     cd $project_name
     echo "#" "$project_name" > README.md
+
+    if [ -n "$language" ]; then
+        $language
+    fi
 }
 
 function access_github()
@@ -66,11 +124,14 @@ function access_github()
     fi
 }
 
-while getopts "n:p:grch" OPTION;
+while getopts "n:l:p:grch" OPTION;
 do
     case $OPTION in
     n)
         project_name=$OPTARG
+        ;;
+    l)
+        language=$OPTARG
         ;;
     p)
         path_to_repo=$OPTARG

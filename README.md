@@ -2,6 +2,7 @@
 - Create new project directory
 - Initialize git
 - Upload to GitHub
+- Create template code for C, C++ with Cmake support
 ## Setup
 - Create personal access token for GitHub authentication. GitHub > Settings > Developer settings > Personal access tokens
 - To make the script available everywhere add to ~/.bashrc:  
