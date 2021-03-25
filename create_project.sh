@@ -124,6 +124,14 @@ function access_github()
     fi
 }
 
+function make_globally_available()
+{
+    executable="/usr/local/bin/create-project"
+    if [ ! -f $executable ]; then
+        sudo ln -s $(pwd)/create_project.sh $executable
+    fi
+}
+
 while getopts "n:l:p:grch" OPTION;
 do
     case $OPTION in
@@ -159,7 +167,9 @@ shift "$(($OPTIND -1))"
 
 YELLOW='\033[0;33m'
 NC='\033[0m'
- 
+
+make_globally_available
+
 if [ -z "$project_name" ]; then
     echo -e "Provide a project name:"
     read project_name
