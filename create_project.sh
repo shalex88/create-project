@@ -34,15 +34,15 @@ function init_git()
 function push_to_github()
 {
     echo -e "${YELLOW}Create GitHub repository${NC}"
-    curl -H "Authorization: token $GH_API_TOKEN" https://api.github.com/user/repos -d '{"name": "'"${project_name}"'"}'
-    git remote add origin https://github.com/$GH_USER/"$project_name".git
+    curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${project_name}"'"}'
+    git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"$project_name".git
     git push -u origin main dev
 }
 
 function c()
 {
-    mkdir src
-    mkdir inc
+    mkdir -p src
+    mkdir -p inc
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
         'project('$project_name' C)'\
@@ -68,8 +68,8 @@ function c()
 
 function cpp()
 {
-    mkdir src
-    mkdir inc
+    mkdir -p src
+    mkdir -p inc
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
         'project('$project_name')'\
@@ -98,7 +98,7 @@ function create_project()
     echo -e "${YELLOW}Creating project${NC}"
 
     cd $path_to_repo
-    mkdir $project_name
+    mkdir -p $project_name
     cd $project_name
     echo "#" "$project_name" > README.md
 
@@ -109,18 +109,17 @@ function create_project()
 
 function access_github()
 {
-    DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-    TOKEN_FILE="$DIR/github_token"
+    TOKEN_FILE="/home/${USER}/.github_token"
 
-    if [ -f "$TOKEN_FILE" ]; then
-        { IFS= read -r GH_USER && IFS= read -r GH_API_TOKEN; } < $TOKEN_FILE
+    if [ -f "${TOKEN_FILE}" ]; then
+        { IFS= read -r GH_USER && IFS= read -r GH_API_TOKEN; } < ${TOKEN_FILE}
     else
         echo -e "Provide github user name:"
         read -e -p "" GH_USER
         echo -e "Provide github token:"
         read -e -p "" GH_API_TOKEN
-        echo $GH_USER >> $TOKEN_FILE
-        echo $GH_API_TOKEN >> $TOKEN_FILE
+        echo ${GH_USER} > ${TOKEN_FILE}
+        echo ${GH_API_TOKEN} >> ${TOKEN_FILE}
     fi
 }
 
