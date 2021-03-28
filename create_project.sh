@@ -1,21 +1,20 @@
 #!/bin/bash -e
 
-function usage()
+usage()
 {
     echo "usage: $(basename $0) [options]"
     echo "options:"
     echo "-h - help"
-    echo "-n - project name"
-    echo "-l - project language"
-    echo "-p - project path"
-    echo "-g - git init"
-    echo "-r - push to GitHub"
+    echo "-n <value> - project name"
+    echo "-l <c|cpp> - template project language"
+    echo "-p <value> - project parent directory path"
+    echo "-g - init git repository"
+    echo "-r - init git repository & push to GitHub"
+    echo "-e - open in VSCode editor"
 }
 
-function init_git()
+init_git()
 {
-    echo -e "${YELLOW}Init Git repository${NC}"
-
     printf '%s\n' '# IDE files'\
         '/.idea/'\
         '/.vscode/' \
@@ -29,23 +28,26 @@ function init_git()
     git commit -m "Initial commit"
     git branch -M main
     git checkout -b dev
+
+    echo -e "${YELLOW}Git repository initialized${NC}"
 }
 
-function push_to_github()
+push_to_github()
 {
-    echo -e "${YELLOW}Create GitHub repository${NC}"
-    curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${project_name}"'"}'
-    git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"$project_name".git
-    git push -u origin main dev
+    curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${PROJECT_NAME}"'"}'
+    git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"${PROJECT_NAME}".git
+    git push -u origin main dev -f
+    
+    echo -e "${YELLOW}Uploaded to GitHub${NC}"
 }
 
-function c()
+c()
 {
     mkdir -p src
     mkdir -p inc
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
-        'project('$project_name' C)'\
+        'project('${PROJECT_NAME}' C)'\
         '' \
         'set(CMAKE_C_STANDARD 11)' \
         '' \
@@ -66,13 +68,13 @@ function c()
         > src/main.c
 }
 
-function cpp()
+cpp()
 {
     mkdir -p src
     mkdir -p inc
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
-        'project('$project_name')'\
+        'project('${PROJECT_NAME}')'\
         '' \
         'set(CMAKE_CXX_STANDARD 20)' \
         '' \
@@ -93,21 +95,21 @@ function cpp()
         > src/main.cpp
 }
 
-function create_project()
+create_project()
 {
-    echo -e "${YELLOW}Creating project${NC}"
+    cd "${PATH_TO_REPO}"
+    mkdir -p "${PROJECT_NAME}" && cd "$_"
 
-    cd $path_to_repo
-    mkdir -p $project_name
-    cd $project_name
-    echo "#" "$project_name" > README.md
+    echo "#" "${PROJECT_NAME}" > README.md
 
-    if [ -n "$language" ]; then
-        $language
+    if [ -n "${LANGUAGE}" ]; then
+        ${LANGUAGE}
     fi
+
+    echo -e "${YELLOW}Project created${NC}"
 }
 
-function access_github()
+access_github()
 {
     TOKEN_FILE="/home/${USER}/.github_token"
 
@@ -123,34 +125,49 @@ function access_github()
     fi
 }
 
-function make_globally_available()
+make_globally_available()
 {
-    executable="/usr/local/bin/create-project"
-    if [ ! -f $executable ]; then
-        sudo ln -s $(pwd)/create_project.sh $executable
+    EXECUTABLE="/usr/local/bin/create-project"
+    if [ ! -f ${EXECUTABLE} ]; then
+        sudo ln -s $(pwd)/create_project.sh ${EXECUTABLE}
+        echo -e "${YELLOW}create-project is now available globally${NC}"
     fi
 }
 
-while getopts "n:l:p:grch" OPTION;
+YELLOW='\033[0;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+while getopts "n:l:p:greh" OPTION;
 do
-    case $OPTION in
+    case ${OPTION} in
     n)
-        project_name=$OPTARG
+        PROJECT_NAME=${OPTARG}
         ;;
     l)
-        language=$OPTARG
+        LANGUAGE=${OPTARG}
+        if [ "${LANGUAGE}" != "c" ] && [ "${LANGUAGE}" != "cpp" ]; then
+            echo -e "${RED}Error: Language is not supported${NC}"
+            usage
+            exit 1
+        fi
         ;;
     p)
-        path_to_repo=$OPTARG
+        PATH_TO_REPO=${OPTARG}
         ;;
     g)
-        git_enable="yes"
+        GIT_ENABLE="yes"
         ;;
     r)
-        push_to_remote="yes"
+        GIT_ENABLE="yes"
+        PUSH_TO_REMOTE="yes"
         ;;
-    c)
-        editor="yes"
+    e)
+        if [ -z "$(command -v code)" ]; then
+            echo -e "${RED}Error: VSCode not found${NC}"
+            exit 1
+        fi
+        EDITOR="yes"
         ;;
     h)
         usage
@@ -164,32 +181,36 @@ do
 done
 shift "$(($OPTIND -1))"
 
-YELLOW='\033[0;33m'
-NC='\033[0m'
-
 make_globally_available
 
-if [ -z "$project_name" ]; then
+if [ -z "${PROJECT_NAME}" ]; then
     echo -e "Provide a project name:"
-    read project_name
+    read PROJECT_NAME
 fi
 
-if [ -z "$path_to_repo" ]; then
-    echo -e "Provide a project path:"
-    read path_to_repo
+if [ -z "${PATH_TO_REPO}" ]; then
+    echo -e "Provide a project parent directory path:"
+    read -r PATH_TO_REPO
+    PATH_TO_REPO=${PATH_TO_REPO/\~/$HOME}
+    PATH_TO_REPO=${PATH_TO_REPO%/}
 fi
 
-create_project
+if [ -e "${PATH_TO_REPO}" ]; then
+    create_project
+else
+    echo -e "${RED}Error: Wrong path was provided${NC}"
+    exit 1;
+fi
 
-if [ -n "${git_enable}" ]; then
+if [ -n "${GIT_ENABLE}" ]; then
     init_git
 fi
 
-if [ -n "${push_to_remote}" ]; then
+if [ -n "${PUSH_TO_REMOTE}" ]; then
     access_github
     push_to_github
 fi
 
-if [ -n "${editor}" ]; then
-    code $path_to_repo/$project_name
+if [ -n "${EDITOR}" ]; then
+    code "${PATH_TO_REPO}/${PROJECT_NAME}"
 fi
