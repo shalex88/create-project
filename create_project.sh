@@ -7,7 +7,7 @@ usage()
     echo "-h - help"
     echo "-n <value> - project name"
     echo "-l <c|cpp> - template project language"
-    echo "-p <value> - project parent directory path"
+    echo "-p <value> - project parent directory absolute path"
     echo "-g - init git repository"
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
@@ -189,10 +189,14 @@ if [ -z "${PROJECT_NAME}" ]; then
 fi
 
 if [ -z "${PATH_TO_REPO}" ]; then
-    echo -e "Provide a project parent directory path:"
+    echo -e "Provide a project parent directory absolute path:"
     read -r PATH_TO_REPO
     PATH_TO_REPO=${PATH_TO_REPO/\~/$HOME}
     PATH_TO_REPO=${PATH_TO_REPO%/}
+fi
+
+if [ "${PATH_TO_REPO}" = "." ]; then
+    PATH_TO_REPO=${PWD}
 fi
 
 if [ -e "${PATH_TO_REPO}" ]; then
