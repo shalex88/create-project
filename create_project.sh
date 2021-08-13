@@ -150,10 +150,12 @@ create_project()
         ${LANGUAGE}
     fi
 
-    if [ "${GTEST}" = "yes" ] && [ "${LANGUAGE}" = "cpp" ]; then
-        set_gtest
-    else
-        echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
+    if [ "${GTEST}" = "yes" ]; then
+        if [ "${LANGUAGE}" = "cpp" ]; then
+            set_gtest
+        else
+            echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
+        fi
     fi
 
     echo -e "${YELLOW}Project created${NC}"
