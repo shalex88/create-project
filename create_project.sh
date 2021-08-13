@@ -133,7 +133,7 @@ set_gtest()
     printf '%s\n' '#include "gtest/gtest.h"'\
         '/* Add your project include files here */'\
         '' \
-        'TEST(MyFirstTestProject, MyFirstTest) {' \
+        'TEST(TestFixtureName, TestName) {' \
         '   EXPECT_TRUE(true);' \
         '}' \
         > tests/tests.cpp
