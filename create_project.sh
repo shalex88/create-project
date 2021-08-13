@@ -12,6 +12,8 @@ usage()
     echo "-g - init git repository"
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
+    echo "example:"
+    echo "create-project -n test_project -p . -l cpp -t -g -e"
 }
 
 init_git()
