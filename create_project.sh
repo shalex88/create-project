@@ -8,6 +8,7 @@ usage()
     echo "-n <value> - project name"
     echo "-l <c|cpp> - template project language"
     echo "-p <value> - project parent directory absolute path"
+    echo "-t - add googletest framework for cpp"
     echo "-g - init git repository"
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
@@ -37,7 +38,7 @@ push_to_github()
     curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${PROJECT_NAME}"'"}'
     git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"${PROJECT_NAME}".git
     git push -u origin main dev -f
-    
+
     echo -e "${YELLOW}Uploaded to GitHub${NC}"
 }
 
@@ -53,10 +54,10 @@ c()
         '' \
         'include_directories(inc)' \
         'file(GLOB_RECURSE SOURCES "src/*.c")' \
-        'file(GLOB_RECURSE INCLUDES "inc/*.h")' \
+        'file(GLOB_RECURSE HEADERS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})' \
+        'add_executable(${PROJECT_NAME} main.c ${SOURCES} ${HEADERS})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <stdio.h>'\
@@ -65,7 +66,7 @@ c()
         '    printf("Hello, World!\n");' \
         '    return 0;' \
         '}' \
-        > src/main.c
+        > main.c
 }
 
 cpp()
@@ -80,10 +81,10 @@ cpp()
         '' \
         'include_directories(inc)' \
         'file(GLOB_RECURSE SOURCES "src/*.cpp")' \
-        'file(GLOB_RECURSE INCLUDES "inc/*.h")' \
+        'file(GLOB_RECURSE HEADERS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} ${SOURCES} ${INCLUDES})' \
+        'add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <iostream>'\
@@ -92,7 +93,44 @@ cpp()
         '    std::cout << "Hello, World!" << std::endl;' \
         '    return 0;' \
         '}' \
-        > src/main.cpp
+        > main.cpp
+}
+
+set_gtest()
+{
+    mkdir -p tests
+
+    printf '%s\n' ''\
+        'add_subdirectory(tests)'\
+        >> CMakeLists.txt
+
+    printf '%s\n' 'project('${PROJECT_NAME}'_test)'\
+        '' \
+        'include(FetchContent)' \
+        'FetchContent_Declare(' \
+        '   googletest' \
+        '   GIT_REPOSITORY https://github.com/google/googletest.git' \
+        ')' \
+        '' \
+        '# For Windows: Prevent overriding the parent project compiler/linker settings' \
+        'set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)' \
+        'FetchContent_MakeAvailable(googletest)' \
+        '' \
+        'file(GLOB_RECURSE SOURCES "../src/*.cpp")' \
+        'file(GLOB_RECURSE HEADERS "../inc/*.h")' \
+        'file(GLOB_RECURSE TESTS "*.cpp")' \
+        '' \
+        'add_executable(${PROJECT_NAME} ${TESTS} ${SOURCES} ${HEADERS})' \
+        'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
+        > tests/CMakeLists.txt
+
+    printf '%s\n' '#include "gtest/gtest.h"'\
+        '/* Add your project include files here */'\
+        '' \
+        'TEST(MyFirstTestProject, MyFirstTest) {' \
+        '   EXPECT_TRUE(true);' \
+        '}' \
+        > tests/tests.cpp
 }
 
 create_project()
@@ -104,6 +142,12 @@ create_project()
 
     if [ -n "${LANGUAGE}" ]; then
         ${LANGUAGE}
+    fi
+
+    if [ "${GTEST}" = "yes" ] && [ "${LANGUAGE}" = "cpp" ]; then
+        set_gtest
+    else
+        echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
     fi
 
     echo -e "${YELLOW}Project created${NC}"
@@ -136,9 +180,10 @@ make_globally_available()
 
 YELLOW='\033[0;33m'
 RED='\033[0;31m'
+L_RED='\033[0;91m'
 NC='\033[0m'
 
-while getopts "n:l:p:greh" OPTION;
+while getopts "n:l:p:tgreh" OPTION;
 do
     case ${OPTION} in
     n)
@@ -154,6 +199,9 @@ do
         ;;
     p)
         PATH_TO_REPO=${OPTARG}
+        ;;
+    t)
+        GTEST="yes"
         ;;
     g)
         GIT_ENABLE="yes"
