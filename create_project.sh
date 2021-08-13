@@ -47,7 +47,9 @@ push_to_github()
 c()
 {
     mkdir -p src
+    touch src/.gitkeep
     mkdir -p inc
+    touch inc/.gitkeep
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
         'project('${PROJECT_NAME}' C)'\
@@ -74,7 +76,9 @@ c()
 cpp()
 {
     mkdir -p src
+    touch src/.gitkeep
     mkdir -p inc
+    touch inc/.gitkeep
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
         'project('${PROJECT_NAME}')'\
