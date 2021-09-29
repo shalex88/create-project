@@ -18,8 +18,8 @@ usage()
 
 init_git()
 {
-    printf '%s\n' '# IDE files'\
-        '/.idea/'\
+    printf '%s\n' '# IDE files' \
+        '/.idea/' \
         '/.vscode/' \
         '' \
         '# Build artifacts' \
@@ -51,8 +51,8 @@ c()
     mkdir -p inc
     touch inc/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
-        'project('${PROJECT_NAME}' C)'\
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)' \
+        'project('${PROJECT_NAME}' C)' \
         '' \
         'set(CMAKE_C_STANDARD 11)' \
         '' \
@@ -80,8 +80,8 @@ cpp()
     mkdir -p inc
     touch inc/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)'\
-        'project('${PROJECT_NAME}')'\
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)' \
+        'project('${PROJECT_NAME}')' \
         '' \
         'set(CMAKE_CXX_STANDARD 20)' \
         '' \
@@ -93,7 +93,7 @@ cpp()
         'add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})' \
         > CMakeLists.txt
 
-    printf '%s\n' '#include <iostream>'\
+    printf '%s\n' '#include <iostream>' \
         '' \
         'int main() {' \
         '    std::cout << "Hello, World!" << std::endl;' \
@@ -106,11 +106,11 @@ set_gtest()
 {
     mkdir -p tests
 
-    printf '%s\n' ''\
-        'add_subdirectory(tests)'\
+    printf '%s\n' '' \
+        'add_subdirectory(tests)' \
         >> CMakeLists.txt
 
-    printf '%s\n' 'project('${PROJECT_NAME}'_test)'\
+    printf '%s\n' 'project('${PROJECT_NAME}'_test)' \
         '' \
         'include(FetchContent)' \
         'FetchContent_Declare(' \
@@ -130,8 +130,8 @@ set_gtest()
         'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
         > tests/CMakeLists.txt
 
-    printf '%s\n' '#include "gtest/gtest.h"'\
-        '/* Add your project include files here */'\
+    printf '%s\n' '#include "gtest/gtest.h"' \
+        '/* Add your project include files here */' \
         '' \
         'TEST(TestFixtureName, TestName) {' \
         '   EXPECT_TRUE(true);' \
