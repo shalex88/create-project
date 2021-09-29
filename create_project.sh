@@ -139,6 +139,47 @@ set_gtest()
         > tests/tests.cpp
 }
 
+create_github_actions()
+{
+    if [ -n "${PUSH_TO_REMOTE}" ]; then
+        mkdir -p .github/workflows
+
+        printf '%s\n' 'name: Build and Run' \
+            '' \
+            'on:' \
+            '  push:' \
+            '  pull_request:' \
+            '' \
+            'env:' \
+            '  BUILD_TYPE: Release' \
+            '' \
+            'jobs:' \
+            '  build:' \
+            '    runs-on: ubuntu-latest' \
+            '' \
+            '    steps:' \
+            '    - uses: actions/checkout@v2' \
+            '' \
+            '    - name: Get repo name' \
+            '      id: repo-name' \
+            '      run: echo "::set-output name=value::$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')"' \
+            '' \
+            '    - name: Configure' \
+            '      run: cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}' \
+            '' \
+            '    - name: Build' \
+            '      run: cmake --build build --config ${{env.BUILD_TYPE}}' \
+            '' \
+            '    - name: Run' \
+            '      run: ./build/${{ steps.repo-name.outputs.value }}' \
+            > .github/workflows/build.yaml
+
+        printf '%s\n' '' \
+            '[![Build and Run](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/build.yaml/badge.svg)](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/build.yaml)' \
+            >> README.md
+    fi
+}
+
 create_project()
 {
     cd "${PATH_TO_REPO}"
@@ -175,6 +216,8 @@ access_github()
         echo ${GH_USER} > ${TOKEN_FILE}
         echo ${GH_API_TOKEN} >> ${TOKEN_FILE}
     fi
+
+    create_github_actions
 }
 
 make_globally_available()
@@ -262,12 +305,15 @@ else
     exit 1;
 fi
 
+if [ -n "${PUSH_TO_REMOTE}" ]; then
+    access_github
+fi
+
 if [ -n "${GIT_ENABLE}" ]; then
     init_git
 fi
 
 if [ -n "${PUSH_TO_REMOTE}" ]; then
-    access_github
     push_to_github
 fi
 
