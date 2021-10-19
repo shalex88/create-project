@@ -57,8 +57,8 @@ c()
         'set(CMAKE_C_STANDARD 11)' \
         '' \
         'include_directories(inc)' \
-        'file(GLOB_RECURSE SOURCES "src/*.c")' \
-        'file(GLOB_RECURSE HEADERS "inc/*.h")' \
+        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.c")' \
+        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} main.c ${SOURCES} ${HEADERS})' \
@@ -86,8 +86,8 @@ cpp()
         'set(CMAKE_CXX_STANDARD 20)' \
         '' \
         'include_directories(inc)' \
-        'file(GLOB_RECURSE SOURCES "src/*.cpp")' \
-        'file(GLOB_RECURSE HEADERS "inc/*.h")' \
+        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")' \
+        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})' \
@@ -122,9 +122,9 @@ set_gtest()
         'set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)' \
         'FetchContent_MakeAvailable(googletest)' \
         '' \
-        'file(GLOB_RECURSE SOURCES "../src/*.cpp")' \
-        'file(GLOB_RECURSE HEADERS "../inc/*.h")' \
-        'file(GLOB_RECURSE TESTS "*.cpp")' \
+        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "../src/*.cpp")' \
+        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "../inc/*.h")' \
+        'file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "*.cpp")' \
         '' \
         'add_executable(${PROJECT_NAME} ${TESTS} ${SOURCES} ${HEADERS})' \
         'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
