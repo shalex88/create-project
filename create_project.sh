@@ -47,7 +47,6 @@ push_to_github()
 c()
 {
     mkdir -p src
-    touch src/.gitkeep
     mkdir -p inc
     touch inc/.gitkeep
 
@@ -61,7 +60,7 @@ c()
         'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} main.c ${SOURCES} ${HEADERS})' \
+        'add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <stdio.h>'\
@@ -70,13 +69,12 @@ c()
         '    printf("Hello, World!\n");' \
         '    return 0;' \
         '}' \
-        > main.c
+        > src/main.c
 }
 
 cpp()
 {
     mkdir -p src
-    touch src/.gitkeep
     mkdir -p inc
     touch inc/.gitkeep
 
@@ -90,7 +88,7 @@ cpp()
         'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} main.cpp ${SOURCES} ${HEADERS})' \
+        'add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <iostream>' \
@@ -99,7 +97,7 @@ cpp()
         '    std::cout << "Hello, World!" << std::endl;' \
         '    return 0;' \
         '}' \
-        > main.cpp
+        > src/main.cpp
 }
 
 set_gtest()
@@ -123,6 +121,7 @@ set_gtest()
         'FetchContent_MakeAvailable(googletest)' \
         '' \
         'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "../src/*.cpp")' \
+        'list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")' \
         'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "../inc/*.h")' \
         'file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "*.cpp")' \
         '' \
