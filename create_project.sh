@@ -46,21 +46,21 @@ push_to_github()
 
 c()
 {
-    mkdir -p src
-    mkdir -p inc
-    touch inc/.gitkeep
+    mkdir -p source
+    mkdir -p include
+    touch include/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)' \
-        'project('${PROJECT_NAME}' C)' \
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
+        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES C)' \
         '' \
         'set(CMAKE_C_STANDARD 11)' \
         '' \
-        'include_directories(inc)' \
-        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.c")' \
-        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
+        'include_directories(include)' \
+        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.c")' \
+        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})' \
+        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <stdio.h>'\
@@ -69,26 +69,26 @@ c()
         '    printf("Hello, World!\n");' \
         '    return 0;' \
         '}' \
-        > src/main.c
+        > source/main.c
 }
 
 cpp()
 {
-    mkdir -p src
-    mkdir -p inc
-    touch inc/.gitkeep
+    mkdir -p source
+    mkdir -p include
+    touch include/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.16)' \
-        'project('${PROJECT_NAME}')' \
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
+        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES CXX)' \
         '' \
-        'set(CMAKE_CXX_STANDARD 20)' \
+        'set(CMAKE_CXX_STANDARD 17)' \
         '' \
-        'include_directories(inc)' \
-        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")' \
-        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc/*.h")' \
+        'include_directories(include)' \
+        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.cpp")' \
+        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
         'add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})' \
+        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <iostream>' \
@@ -97,7 +97,7 @@ cpp()
         '    std::cout << "Hello, World!" << std::endl;' \
         '    return 0;' \
         '}' \
-        > src/main.cpp
+        > source/main.cpp
 }
 
 set_gtest()
@@ -120,12 +120,12 @@ set_gtest()
         'set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)' \
         'FetchContent_MakeAvailable(googletest)' \
         '' \
-        'file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "../src/*.cpp")' \
-        'list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/../src/main.cpp")' \
-        'file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "../inc/*.h")' \
-        'file(GLOB_RECURSE TESTS CONFIGURE_DEPENDS "*.cpp")' \
+        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "../source/*.cpp")' \
+        'list(REMOVE_ITEM sourceFiles "${CMAKE_CURRENT_SOURCE_DIR}/../source/main.cpp")' \
+        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "../include/*.h")' \
+        'file(GLOB_RECURSE testFiles CONFIGURE_DEPENDS "*.cpp")' \
         '' \
-        'add_executable(${PROJECT_NAME} ${TESTS} ${SOURCES} ${HEADERS})' \
+        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles} ${testFiles})' \
         'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
         > tests/CMakeLists.txt
 
