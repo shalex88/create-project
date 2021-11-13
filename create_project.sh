@@ -51,15 +51,22 @@ c()
     touch include/.gitkeep
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES C)' \
+        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES C)' \
         '' \
         'set(CMAKE_C_STANDARD 11)' \
+        '' \
+        'if(CMAKE_C_COMPILER_ID STREQUAL "GNU")' \
+        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")' \
+        '    add_compile_options(/W4)' \
+        'else()' \
+        '    message(WARNING "Unknown Compiler ${CMAKE_C_COMPILER_ID}")' \
+        'endif()' \
         '' \
         'include_directories(include)' \
         'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.c")' \
         'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
-        'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
@@ -79,15 +86,22 @@ cpp()
     touch include/.gitkeep
 
     printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES CXX)' \
+        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES CXX)' \
         '' \
         'set(CMAKE_CXX_STANDARD 17)' \
+        '' \
+        'if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")' \
+        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")' \
+        '    add_compile_options(/W4)' \
+        'else()' \
+        '    message(WARNING "Unknown Compiler ${CMAKE_CXX_COMPILER_ID}")' \
+        'endif()' \
         '' \
         'include_directories(include)' \
         'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.cpp")' \
         'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
-        'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
