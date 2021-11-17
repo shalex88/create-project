@@ -235,9 +235,17 @@ access_github()
 
 make_globally_available()
 {
-    EXECUTABLE="/usr/local/bin/create-project"
+    local superuser
+
+    if [[ "$OSTYPE" == "msys" ]]; then
+        EXECUTABLE="/usr/bin/create-project"
+    else
+        EXECUTABLE="/usr/local/bin/create-project"
+        superuser="sudo"
+    fi;
+
     if [ ! -f ${EXECUTABLE} ]; then
-        sudo ln -s $(pwd)/create_project.sh ${EXECUTABLE}
+        ${superuser} ln -s $(pwd)/create_project.sh ${EXECUTABLE}
         echo -e "${YELLOW}create-project is now available globally${NC}"
     fi
 }
