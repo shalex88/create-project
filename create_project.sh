@@ -200,12 +200,12 @@ create_project()
 
     echo "#" "${PROJECT_NAME}" > README.md
 
-    if [ -n "${LANGUAGE}" ]; then
-        ${LANGUAGE}
+    if [ -n "${PROJ_LANGUAGE}" ]; then
+        ${PROJ_LANGUAGE}
     fi
 
     if [ "${GTEST}" = "yes" ]; then
-        if [ "${LANGUAGE}" = "cpp" ]; then
+        if [ "${PROJ_LANGUAGE}" = "cpp" ]; then
             set_gtest
         else
             echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
@@ -262,8 +262,8 @@ do
         PROJECT_NAME=${OPTARG}
         ;;
     l)
-        LANGUAGE=${OPTARG}
-        if [ "${LANGUAGE}" != "c" ] && [ "${LANGUAGE}" != "cpp" ]; then
+        PROJ_LANGUAGE=${OPTARG}
+        if [ "${PROJ_LANGUAGE}" != "c" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
             echo -e "${RED}Error: Language is not supported${NC}"
             usage
             exit 1
