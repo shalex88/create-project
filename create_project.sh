@@ -50,16 +50,23 @@ c()
     mkdir -p include
     touch include/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES C)' \
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.22 FATAL_ERROR)' \
+        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES C)' \
         '' \
         'set(CMAKE_C_STANDARD 11)' \
+        '' \
+        'if(CMAKE_C_COMPILER_ID STREQUAL "GNU")' \
+        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")' \
+        '    add_compile_options(/W4)' \
+        'else()' \
+        '    message(WARNING "Unknown Compiler ${CMAKE_C_COMPILER_ID}")' \
+        'endif()' \
         '' \
         'include_directories(include)' \
         'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.c")' \
         'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
-        'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
@@ -78,16 +85,23 @@ cpp()
     mkdir -p include
     touch include/.gitkeep
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.15 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0 LANGUAGES CXX)' \
+    printf '%s\n' 'cmake_minimum_required(VERSION 3.22 FATAL_ERROR)' \
+        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES CXX)' \
         '' \
         'set(CMAKE_CXX_STANDARD 17)' \
+        '' \
+        'if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")' \
+        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
+        'elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")' \
+        '    add_compile_options(/W4)' \
+        'else()' \
+        '    message(WARNING "Unknown Compiler ${CMAKE_CXX_COMPILER_ID}")' \
+        'endif()' \
         '' \
         'include_directories(include)' \
         'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.cpp")' \
         'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
         '' \
-        'add_compile_options(-Wall -Wextra -Wpedantic)' \
         'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
         > CMakeLists.txt
 
@@ -108,12 +122,13 @@ set_gtest()
         'add_subdirectory(tests)' \
         >> CMakeLists.txt
 
-    printf '%s\n' 'project('${PROJECT_NAME}'_test)' \
+    printf '%s\n' 'project(${PROJECT_NAME}_test)' \
         '' \
         'include(FetchContent)' \
         'FetchContent_Declare(' \
         '   googletest' \
         '   GIT_REPOSITORY https://github.com/google/googletest.git' \
+        '   GIT_TAG release-1.12.1' \
         ')' \
         '' \
         '# For Windows: Prevent overriding the parent project compiler/linker settings' \
@@ -186,12 +201,12 @@ create_project()
 
     echo "#" "${PROJECT_NAME}" > README.md
 
-    if [ -n "${LANGUAGE}" ]; then
-        ${LANGUAGE}
+    if [ -n "${PROJ_LANGUAGE}" ]; then
+        ${PROJ_LANGUAGE}
     fi
 
     if [ "${GTEST}" = "yes" ]; then
-        if [ "${LANGUAGE}" = "cpp" ]; then
+        if [ "${PROJ_LANGUAGE}" = "cpp" ]; then
             set_gtest
         else
             echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
@@ -221,9 +236,17 @@ access_github()
 
 make_globally_available()
 {
-    EXECUTABLE="/usr/local/bin/create-project"
+    local superuser
+
+    if [[ "$OSTYPE" == "msys" ]]; then
+        EXECUTABLE="/usr/bin/create-project"
+    else
+        EXECUTABLE="/usr/local/bin/create-project"
+        superuser="sudo"
+    fi;
+
     if [ ! -f ${EXECUTABLE} ]; then
-        sudo ln -s $(pwd)/create_project.sh ${EXECUTABLE}
+        ${superuser} ln -s $(pwd)/create_project.sh ${EXECUTABLE}
         echo -e "${YELLOW}create-project is now available globally${NC}"
     fi
 }
@@ -240,8 +263,8 @@ do
         PROJECT_NAME=${OPTARG}
         ;;
     l)
-        LANGUAGE=${OPTARG}
-        if [ "${LANGUAGE}" != "c" ] && [ "${LANGUAGE}" != "cpp" ]; then
+        PROJ_LANGUAGE=${OPTARG}
+        if [ "${PROJ_LANGUAGE}" != "c" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
             echo -e "${RED}Error: Language is not supported${NC}"
             usage
             exit 1
