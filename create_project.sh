@@ -64,10 +64,9 @@ c()
         'endif()' \
         '' \
         'include_directories(include)' \
-        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.c")' \
-        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
+        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "source/*.c")' \
         '' \
-        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
+        'add_executable(${PROJECT_NAME} ${SOURCE_FILES})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <stdio.h>'\
@@ -99,10 +98,9 @@ cpp()
         'endif()' \
         '' \
         'include_directories(include)' \
-        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "source/*.cpp")' \
-        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "include/*.h")' \
+        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "source/*.cpp")' \
         '' \
-        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles})' \
+        'add_executable(${PROJECT_NAME} ${SOURCE_FILES})' \
         > CMakeLists.txt
 
     printf '%s\n' '#include <iostream>' \
@@ -135,12 +133,11 @@ set_gtest()
         'set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)' \
         'FetchContent_MakeAvailable(googletest)' \
         '' \
-        'file(GLOB_RECURSE sourceFiles CONFIGURE_DEPENDS "../source/*.cpp")' \
-        'list(REMOVE_ITEM sourceFiles "${CMAKE_CURRENT_SOURCE_DIR}/../source/main.cpp")' \
-        'file(GLOB_RECURSE headerFiles CONFIGURE_DEPENDS "../include/*.h")' \
-        'file(GLOB_RECURSE testFiles CONFIGURE_DEPENDS "*.cpp")' \
+        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "../source/*.cpp")' \
+        'list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../source/main.cpp")' \
+        'file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS "*.cpp")' \
         '' \
-        'add_executable(${PROJECT_NAME} ${sourceFiles} ${headerFiles} ${testFiles})' \
+        'add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEST_FILES})' \
         'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
         > tests/CMakeLists.txt
 
