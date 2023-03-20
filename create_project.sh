@@ -9,11 +9,29 @@ usage()
     echo "-l <c|cpp> - template project language"
     echo "-p <value> - project parent directory absolute path"
     echo "-t - add googletest framework for cpp"
+    echo "-u - add PlantUML template"
     echo "-g - init git repository"
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
     echo "example:"
     echo "create-project -n test_project -p . -l cpp -t -g -e"
+}
+
+uml()
+{
+    mkdir -p docs
+    printf '%s\n' '@startuml '"${PROJECT_NAME}"'' \
+    ''"'"'https://plantuml.com/class-diagram' \
+    'skinparam classAttributeIconSize 0' \
+    '' \
+    ''"'"'Classes' \
+    '' \
+    ''"'"'Relations' \
+    '' \
+    ''"'"'Notes' \
+    '' \
+    '@enduml' \
+    > docs/"${PROJECT_NAME}".puml
 }
 
 init_git()
@@ -210,6 +228,10 @@ create_project()
         fi
     fi
 
+    if [ "${UML}" = "yes" ]; then
+        uml
+    fi
+
     echo -e "${YELLOW}Project created${NC}"
 }
 
@@ -253,7 +275,7 @@ RED='\033[0;31m'
 L_RED='\033[0;91m'
 NC='\033[0m'
 
-while getopts "n:l:p:tgreh" OPTION;
+while getopts "n:l:p:tgrueh" OPTION;
 do
     case ${OPTION} in
     n)
@@ -279,6 +301,9 @@ do
     r)
         GIT_ENABLE="yes"
         PUSH_TO_REMOTE="yes"
+        ;;
+    u)
+        UML="yes"
         ;;
     e)
         if [ -z "$(command -v code)" ]; then
