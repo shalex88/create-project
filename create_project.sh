@@ -187,11 +187,11 @@ create_github_actions()
             '    runs-on: ubuntu-latest' \
             '' \
             '    steps:' \
-            '    - uses: actions/checkout@v2' \
+            '    - uses: actions/checkout@v3' \
             '' \
             '    - name: Get repo name' \
             '      id: repo-name' \
-            '      run: echo "::set-output name=value::$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')"' \
+            '      run: echo "value=$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')" >> $GITHUB_OUTPUT' \
             '' \
             '    - name: Configure' \
             '      run: cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}' \
