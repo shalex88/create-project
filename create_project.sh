@@ -9,11 +9,29 @@ usage()
     echo "-l <c|cpp> - template project language"
     echo "-p <value> - project parent directory absolute path"
     echo "-t - add googletest framework for cpp"
+    echo "-u - add PlantUML template"
     echo "-g - init git repository"
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
     echo "example:"
     echo "create-project -n test_project -p . -l cpp -t -g -e"
+}
+
+uml()
+{
+    mkdir -p docs
+    printf '%s\n' '@startuml '"${PROJECT_NAME}"'' \
+    ''"'"'https://plantuml.com/class-diagram' \
+    'skinparam classAttributeIconSize 0' \
+    '' \
+    ''"'"'Classes' \
+    '' \
+    ''"'"'Relations' \
+    '' \
+    ''"'"'Notes' \
+    '' \
+    '@enduml' \
+    > docs/"${PROJECT_NAME}".puml
 }
 
 init_git()
@@ -138,7 +156,7 @@ set_gtest()
         'file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS "*.cpp")' \
         '' \
         'add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEST_FILES})' \
-        'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
+        'target_link_libraries(${PROJECT_NAME} gtest gtest_main gmock)' \
         > tests/CMakeLists.txt
 
     printf '%s\n' '#include "gtest/gtest.h"' \
@@ -169,11 +187,11 @@ create_github_actions()
             '    runs-on: ubuntu-latest' \
             '' \
             '    steps:' \
-            '    - uses: actions/checkout@v2' \
+            '    - uses: actions/checkout@v3' \
             '' \
             '    - name: Get repo name' \
             '      id: repo-name' \
-            '      run: echo "::set-output name=value::$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')"' \
+            '      run: echo "value=$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')" >> $GITHUB_OUTPUT' \
             '' \
             '    - name: Configure' \
             '      run: cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}' \
@@ -208,6 +226,10 @@ create_project()
         else
             echo -e "${L_RED}Warning: Googletest is not supported by this language. Ignoring the option${NC}"
         fi
+    fi
+
+    if [ "${UML}" = "yes" ]; then
+        uml
     fi
 
     echo -e "${YELLOW}Project created${NC}"
@@ -253,7 +275,7 @@ RED='\033[0;31m'
 L_RED='\033[0;91m'
 NC='\033[0m'
 
-while getopts "n:l:p:tgreh" OPTION;
+while getopts "n:l:p:tgrueh" OPTION;
 do
     case ${OPTION} in
     n)
@@ -279,6 +301,9 @@ do
     r)
         GIT_ENABLE="yes"
         PUSH_TO_REMOTE="yes"
+        ;;
+    u)
+        UML="yes"
         ;;
     e)
         if [ -z "$(command -v code)" ]; then
