@@ -156,7 +156,7 @@ set_gtest()
         'file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS "*.cpp")' \
         '' \
         'add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEST_FILES})' \
-        'target_link_libraries(${PROJECT_NAME} gtest gtest_main)' \
+        'target_link_libraries(${PROJECT_NAME} gtest gtest_main gmock)' \
         > tests/CMakeLists.txt
 
     printf '%s\n' '#include "gtest/gtest.h"' \
