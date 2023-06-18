@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches:
+      - main
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Get project name
+      run: |
+        echo "PROJECT_NAME=$(echo "${{ github.repository }}" | awk -F '/' '{print $2}')" >> $GITHUB_ENV
+
+    - name: Configure
+      run: |
+        cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      run: |
+        cmake --build build
+
+    - name: Test
+      run: cd ./build/$sub_project && ./$bin
+      env:
+        sub_project: tests
+        bin: ${{ env.PROJECT_NAME }}_test

@@ -10,8 +10,8 @@ usage()
     echo "-p <value> - project parent directory absolute path"
     echo "-t - add googletest framework for cpp"
     echo "-u - add PlantUML template"
-    echo "-g - init git repository"
-    echo "-r - init git repository & push to GitHub"
+    echo "-g - init git repository & push to GitHub"
+    echo "-r - add release package support"
     echo "-e - open in VSCode editor"
     echo "example:"
     echo "create-project -n test_project -p . -l cpp -tuge"
@@ -61,51 +61,37 @@ language()
 set_gtest()
 {
     mkdir -p tests
-    cp -r "${SCRIPT_PATH}"/templates/gtest/* tests/
+    cp -r "${SCRIPT_PATH}"/templates/gtest/tests/* tests/
 
     printf '%s\n' '' \
         'add_subdirectory(tests)' \
         >> CMakeLists.txt
-}
 
-create_github_actions()
-{
-    if [ -n "${PUSH_TO_REMOTE}" ]; then
-        mkdir -p .github/workflows
-
-        printf '%s\n' 'name: Build and Run' \
-            '' \
-            'on:' \
-            '  push:' \
-            '  pull_request:' \
-            '' \
-            'env:' \
-            '  BUILD_TYPE: Release' \
-            '' \
-            'jobs:' \
-            '  build:' \
-            '    runs-on: ubuntu-latest' \
-            '' \
-            '    steps:' \
-            '    - uses: actions/checkout@v3' \
-            '' \
-            '    - name: Get repo name' \
-            '      id: repo-name' \
-            '      run: echo "value=$(echo "${{ github.repository }}" | awk -F '\''/'\'' '\''{print $2}'\'')" >> $GITHUB_OUTPUT' \
-            '' \
-            '    - name: Configure' \
-            '      run: cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}' \
-            '' \
-            '    - name: Build' \
-            '      run: cmake --build build --config ${{env.BUILD_TYPE}}' \
-            '' \
-            '    - name: Run' \
-            '      run: ./build/${{ steps.repo-name.outputs.value }}' \
-            > .github/workflows/build.yaml
+    if [ "${PUSH_TO_REMOTE}" = "yes" ]; then
+        cp -r "${SCRIPT_PATH}"/templates/gtest/.github* .github/
 
         printf '%s\n' '' \
-            '[![Build and Run](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/build.yaml/badge.svg)](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/build.yaml)' \
+            '[![Build and Run](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/test.yml/badge.svg)](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/test.yml)' \
             >> README.md
+    fi
+}
+
+create_release_package()
+{
+    mkdir -p cmake
+    cp -r "${SCRIPT_PATH}"/templates/package/cmake/* cmake/
+
+    OLD_PATTERN="^project("
+    NEW_PATTERN="include(cmake/set_version.cmake)\\nproject(${PROJECT_NAME} LANGUAGES CXX VERSION "'${VERSION}'")"
+    sed -i '/'"$OLD_PATTERN"'/c\'"$NEW_PATTERN" "CMakeLists.txt"
+
+    printf '%s\n' '' \
+        'install(TARGETS ${PROJECT_NAME} DESTINATION bin)' \
+        'include(cmake/create_package.cmake)' \
+        >> CMakeLists.txt
+
+    if [ "${PUSH_TO_REMOTE}" = "yes" ]; then
+        cp -r "${SCRIPT_PATH}"/templates/package/.github/* .github/
     fi
 }
 
@@ -132,6 +118,10 @@ create_project()
         uml
     fi
 
+    if [ "${RELEASE}" = "yes" ]; then
+        create_release_package
+    fi
+
     echo -e "${YELLOW}Project created${NC}"
 }
 
@@ -149,8 +139,6 @@ access_github()
         echo ${GH_USER} > ${TOKEN_FILE}
         echo ${GH_API_TOKEN} >> ${TOKEN_FILE}
     fi
-
-    create_github_actions
 }
 
 make_globally_available()
@@ -196,11 +184,10 @@ do
     t)
         GTEST="yes"
         ;;
-    g)
-        GIT_ENABLE="yes"
-        ;;
     r)
-        GIT_ENABLE="yes"
+        RELEASE="yes"
+        ;;
+    g)
         PUSH_TO_REMOTE="yes"
         ;;
     u)
@@ -243,6 +230,10 @@ if [ "${PATH_TO_REPO}" = "." ]; then
     PATH_TO_REPO=${PWD}
 fi
 
+if [ -n "${PUSH_TO_REMOTE}" ]; then
+    access_github
+fi
+
 if [ -e "${PATH_TO_REPO}" ]; then
     create_project
 else
@@ -250,13 +241,7 @@ else
     exit 1;
 fi
 
-if [ -n "${PUSH_TO_REMOTE}" ]; then
-    access_github
-fi
-
-if [ -n "${GIT_ENABLE}" ]; then
-    init_git
-fi
+init_git
 
 if [ -n "${PUSH_TO_REMOTE}" ]; then
     push_to_github
