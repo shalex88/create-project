@@ -20,29 +20,16 @@ usage()
 uml()
 {
     mkdir -p docs
-    printf '%s\n' '@startuml '"${PROJECT_NAME}"'' \
-    ''"'"'https://plantuml.com/class-diagram' \
-    'skinparam classAttributeIconSize 0' \
-    '' \
-    ''"'"'Classes' \
-    '' \
-    ''"'"'Relations' \
-    '' \
-    ''"'"'Notes' \
-    '' \
-    '@enduml' \
-    > docs/"${PROJECT_NAME}".puml
+    cp -r "${SCRIPT_PATH}"/templates/uml/uml.puml docs/"${PROJECT_NAME}".puml
+
+    OLD_PATTERN="@uml@"
+    NEW_PATTERN="${PROJECT_NAME}"
+    find . -type f -exec sed -i 's/'$OLD_PATTERN'/'$NEW_PATTERN'/g' {} \;
 }
 
 init_git()
 {
-    printf '%s\n' '# IDE files' \
-        '/.idea/' \
-        '/.vscode/' \
-        '' \
-        '# Build artifacts' \
-        '/*build*/' \
-        > .gitignore
+    cp "${SCRIPT_PATH}"/templates/gitignore .gitignore
 
     git init
     git add .
@@ -74,39 +61,11 @@ language()
 set_gtest()
 {
     mkdir -p tests
+    cp -r "${SCRIPT_PATH}"/templates/gtest/* tests/
 
     printf '%s\n' '' \
         'add_subdirectory(tests)' \
         >> CMakeLists.txt
-
-    printf '%s\n' 'project(${PROJECT_NAME}_test)' \
-        '' \
-        'include(FetchContent)' \
-        'FetchContent_Declare(' \
-        '   googletest' \
-        '   GIT_REPOSITORY https://github.com/google/googletest.git' \
-        '   GIT_TAG release-1.12.1' \
-        ')' \
-        '' \
-        '# For Windows: Prevent overriding the parent project compiler/linker settings' \
-        'set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)' \
-        'FetchContent_MakeAvailable(googletest)' \
-        '' \
-        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "../source/*.cpp")' \
-        'list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../source/main.cpp")' \
-        'file(GLOB_RECURSE TEST_FILES CONFIGURE_DEPENDS "*.cpp")' \
-        '' \
-        'add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEST_FILES})' \
-        'target_link_libraries(${PROJECT_NAME} gtest gtest_main gmock)' \
-        > tests/CMakeLists.txt
-
-    printf '%s\n' '#include "gtest/gtest.h"' \
-        '/* Add your project include files here */' \
-        '' \
-        'TEST(TestFixtureName, TestName) {' \
-        '   EXPECT_TRUE(true);' \
-        '}' \
-        > tests/tests.cpp
 }
 
 create_github_actions()
