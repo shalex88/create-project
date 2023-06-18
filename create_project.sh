@@ -7,7 +7,7 @@ usage()
     echo "-h - help"
     echo "-n <value> - project name"
     echo "-l <c|cpp> - template project language"
-    echo "-p <value> - project parent directory absolute path"
+    echo "-p <value> - project parent directory absolute path. default: current dir"
     echo "-t - add googletest framework for cpp"
     echo "-u - add PlantUML template"
     echo "-g - init git repository & push to GitHub"
@@ -172,11 +172,6 @@ do
         ;;
     l)
         PROJ_LANGUAGE=${OPTARG}
-        if [ "${PROJ_LANGUAGE}" != "c" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
-            echo -e "${RED}Error: Language is not supported${NC}"
-            usage
-            exit 1
-        fi
         ;;
     p)
         PATH_TO_REPO=${OPTARG}
@@ -216,18 +211,27 @@ make_globally_available
 
 if [ -z "${PROJECT_NAME}" ]; then
     echo -e "Provide a project name:"
-    read PROJECT_NAME
+    read -r PROJECT_NAME
 fi
 
-if [ -z "${PATH_TO_REPO}" ]; then
-    echo -e "Provide a project parent directory absolute path:"
-    read -r PATH_TO_REPO
-    PATH_TO_REPO=${PATH_TO_REPO/\~/$HOME}
-    PATH_TO_REPO=${PATH_TO_REPO%/}
+if [ -z "${PROJ_LANGUAGE}" ]; then
+    echo -e "Specify a project language:"
+    read -r PROJ_LANGUAGE
+
+    if [ "${PROJ_LANGUAGE}" != "c" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
+        echo -e "${RED}Error: Language is not supported${NC}"
+        usage
+        exit 1
+    fi
 fi
 
-if [ "${PATH_TO_REPO}" = "." ]; then
+if [ -z "${PATH_TO_REPO}" ] || [ "${PATH_TO_REPO}" = "." ]; then
     PATH_TO_REPO=${PWD}
+fi
+
+if [ ! -e "${PATH_TO_CHECK}" ]; then
+    echo -e "${RED}Error: Path is invalid${NC}"
+    exit 1
 fi
 
 if [ -n "${PUSH_TO_REMOTE}" ]; then
