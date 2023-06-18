@@ -14,7 +14,7 @@ usage()
     echo "-r - init git repository & push to GitHub"
     echo "-e - open in VSCode editor"
     echo "example:"
-    echo "create-project -n test_project -p . -l cpp -t -g -e"
+    echo "create-project -n test_project -p . -l cpp -tuge"
 }
 
 uml()
@@ -48,7 +48,7 @@ init_git()
     git add .
     git commit -m "Initial commit"
     git branch -M main
-    git checkout -b dev
+    git checkout -b develop
 
     echo -e "${YELLOW}Git repository initialized${NC}"
 }
@@ -57,77 +57,18 @@ push_to_github()
 {
     curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${PROJECT_NAME}"'"}'
     git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"${PROJECT_NAME}".git
-    git push -u origin main dev -f
+    git push -u origin main develop -f
 
     echo -e "${YELLOW}Uploaded to GitHub${NC}"
 }
 
-c()
+language()
 {
-    mkdir -p source
-    mkdir -p include
-    touch include/.gitkeep
+    cp -r "${SCRIPT_PATH}"/templates/"${PROJ_LANGUAGE}"/* .
 
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.22 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES C)' \
-        '' \
-        'set(CMAKE_C_STANDARD 11)' \
-        '' \
-        'if(CMAKE_C_COMPILER_ID STREQUAL "GNU")' \
-        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")' \
-        '    add_compile_options(/W4)' \
-        'else()' \
-        '    message(WARNING "Unknown Compiler ${CMAKE_C_COMPILER_ID}")' \
-        'endif()' \
-        '' \
-        'include_directories(include)' \
-        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "source/*.c")' \
-        '' \
-        'add_executable(${PROJECT_NAME} ${SOURCE_FILES})' \
-        > CMakeLists.txt
-
-    printf '%s\n' '#include <stdio.h>'\
-        '' \
-        'int main() {' \
-        '    printf("Hello, World!\n");' \
-        '    return 0;' \
-        '}' \
-        > source/main.c
-}
-
-cpp()
-{
-    mkdir -p source
-    mkdir -p include
-    touch include/.gitkeep
-
-    printf '%s\n' 'cmake_minimum_required(VERSION 3.22 FATAL_ERROR)' \
-        'project('${PROJECT_NAME}' VERSION 1.0.0 LANGUAGES CXX)' \
-        '' \
-        'set(CMAKE_CXX_STANDARD 17)' \
-        '' \
-        'if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")' \
-        '    add_compile_options(-Wall -Wextra -Wpedantic)' \
-        'elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")' \
-        '    add_compile_options(/W4)' \
-        'else()' \
-        '    message(WARNING "Unknown Compiler ${CMAKE_CXX_COMPILER_ID}")' \
-        'endif()' \
-        '' \
-        'include_directories(include)' \
-        'file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "source/*.cpp")' \
-        '' \
-        'add_executable(${PROJECT_NAME} ${SOURCE_FILES})' \
-        > CMakeLists.txt
-
-    printf '%s\n' '#include <iostream>' \
-        '' \
-        'int main() {' \
-        '    std::cout << "Hello, World!" << std::endl;' \
-        '    return 0;' \
-        '}' \
-        > source/main.cpp
+    OLD_PATTERN="@${PROJ_LANGUAGE}@"
+    NEW_PATTERN="${PROJECT_NAME}"
+    find . -type f -exec sed -i 's/'$OLD_PATTERN'/'$NEW_PATTERN'/g' {} \;
 }
 
 set_gtest()
@@ -217,7 +158,7 @@ create_project()
     echo "#" "${PROJECT_NAME}" > README.md
 
     if [ -n "${PROJ_LANGUAGE}" ]; then
-        ${PROJ_LANGUAGE}
+        language
     fi
 
     if [ "${GTEST}" = "yes" ]; then
@@ -274,6 +215,7 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m'
 L_RED='\033[0;91m'
 NC='\033[0m'
+SCRIPT_PATH="$(dirname "$( readlink -f "$0" )")"
 
 while getopts "n:l:p:tgrueh" OPTION;
 do
