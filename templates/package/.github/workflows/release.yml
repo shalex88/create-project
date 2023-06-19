@@ -69,4 +69,4 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./${{ steps.build_package.outputs.package_name }}
           asset_name: ${{ steps.build_package.outputs.package_name }}
-          asset_content_type: application/zip
+          asset_content_type: application/x-deb
