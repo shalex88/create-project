@@ -36,7 +36,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build
+          cmake --build build --target ${{ env.PROJECT_NAME }}
 
       - name: Create Package
         id: build_package
