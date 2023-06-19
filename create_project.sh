@@ -229,11 +229,6 @@ if [ -z "${PATH_TO_REPO}" ] || [ "${PATH_TO_REPO}" = "." ]; then
     PATH_TO_REPO=${PWD}
 fi
 
-if [ ! -e "${PATH_TO_CHECK}" ]; then
-    echo -e "${RED}Error: Path is invalid${NC}"
-    exit 1
-fi
-
 if [ -n "${PUSH_TO_REMOTE}" ]; then
     access_github
 fi
