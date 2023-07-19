@@ -80,14 +80,15 @@ create_release_package()
 {
     mkdir -p cmake
     cp -r "${SCRIPT_PATH}"/templates/package/cmake/* cmake/
+    sed -i 's/std::endl;/" " << APP_VERSION_MAJOR << "." << APP_VERSION_MINOR << "." << APP_VERSION_PATCH << std::endl;/g' source/main.cpp
 
     OLD_PATTERN="^project("
-    NEW_PATTERN="include(cmake/set_version.cmake)\\nproject(${PROJECT_NAME} LANGUAGES CXX VERSION "'${VERSION}'")"
+    NEW_PATTERN="include(cmake/SetVersion.cmake)\\nproject(${PROJECT_NAME} LANGUAGES CXX VERSION "'${VERSION}'")"
     sed -i '/'"$OLD_PATTERN"'/c\'"$NEW_PATTERN" "CMakeLists.txt"
 
     printf '%s\n' '' \
         'install(TARGETS ${PROJECT_NAME} DESTINATION bin)' \
-        'include(cmake/create_package.cmake)' \
+        'include(cmake/CreatePackage.cmake)' \
         >> CMakeLists.txt
 
     if [ "${PUSH_TO_REMOTE}" = "yes" ]; then
