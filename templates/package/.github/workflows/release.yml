@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
 
       - name: Get project name
         run: |
@@ -36,7 +38,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build
+          cmake --build build --target ${{ env.PROJECT_NAME }}
 
       - name: Create Package
         id: build_package

@@ -2,7 +2,7 @@
 
 usage()
 {
-    echo "usage: $(basename $0) [options]"
+    echo "usage: $(basename "$0") [options]"
     echo "options:"
     echo "-h - help"
     echo "-n <value> - project name"
@@ -24,7 +24,7 @@ uml()
 
     OLD_PATTERN="@uml@"
     NEW_PATTERN="${PROJECT_NAME}"
-    find . -type f -exec sed -i 's/'$OLD_PATTERN'/'$NEW_PATTERN'/g' {} \;
+    find . -type f -exec sed -i 's/'$OLD_PATTERN'/'"$NEW_PATTERN"'/g' {} \;
 }
 
 init_git()
@@ -43,7 +43,7 @@ init_git()
 push_to_github()
 {
     curl -H "Authorization: token ${GH_API_TOKEN}" https://api.github.com/user/repos -d '{"name": "'"${PROJECT_NAME}"'"}'
-    git remote add origin https://${GH_API_TOKEN}@github.com/${GH_USER}/"${PROJECT_NAME}".git
+    git remote add origin https://"${GH_API_TOKEN}"@github.com/"${GH_USER}"/"${PROJECT_NAME}".git
     git push -u origin main develop -f
 
     echo -e "${YELLOW}Uploaded to GitHub${NC}"
@@ -55,7 +55,7 @@ language()
 
     OLD_PATTERN="@${PROJ_LANGUAGE}@"
     NEW_PATTERN="${PROJECT_NAME}"
-    find . -type f -exec sed -i 's/'$OLD_PATTERN'/'$NEW_PATTERN'/g' {} \;
+    find . -type f -exec sed -i 's/'"$OLD_PATTERN"'/'"$NEW_PATTERN"'/g' {} \;
 }
 
 set_gtest()
@@ -71,7 +71,8 @@ set_gtest()
         cp -r "${SCRIPT_PATH}"/templates/gtest/.github* .github/
 
         printf '%s\n' '' \
-            '[![Build and Run](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/test.yml/badge.svg)](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/test.yml)' \
+            '[![Test](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/actions/workflows/test.yml/badge.svg)](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/actions/workflows/test.yml)' \
+            '[![Coverage](https://img.shields.io/codecov/c/github/'"${GH_USER}"'/'"${PROJECT_NAME}"')](https://codecov.io/github/'"${GH_USER}"'/'"${PROJECT_NAME}"')' \
             >> README.md
     fi
 }
@@ -93,6 +94,10 @@ create_release_package()
 
     if [ "${PUSH_TO_REMOTE}" = "yes" ]; then
         cp -r "${SCRIPT_PATH}"/templates/package/.github/* .github/
+
+        printf '%s\n' \
+            '[![Release](https://img.shields.io/github/v/release/'"${GH_USER}"'/'"${PROJECT_NAME}"'.svg)](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/releases/latest)' \
+            >> README.md
     fi
 }
 
@@ -131,14 +136,14 @@ access_github()
     TOKEN_FILE="/home/${USER}/.github_token"
 
     if [ -f "${TOKEN_FILE}" ]; then
-        { IFS= read -r GH_USER && IFS= read -r GH_API_TOKEN; } < ${TOKEN_FILE}
+        { IFS= read -r GH_USER && IFS= read -r GH_API_TOKEN; } < "${TOKEN_FILE}"
     else
         echo -e "Provide github user name:"
-        read -e -p "" GH_USER
+        read -r -e -p "" GH_USER
         echo -e "Provide github token:"
-        read -e -p "" GH_API_TOKEN
-        echo ${GH_USER} > ${TOKEN_FILE}
-        echo ${GH_API_TOKEN} >> ${TOKEN_FILE}
+        read -r -e -p "" GH_API_TOKEN
+        echo "${GH_USER}" > "${TOKEN_FILE}"
+        echo "${GH_API_TOKEN}" >> "${TOKEN_FILE}"
     fi
 }
 
@@ -154,7 +159,7 @@ make_globally_available()
     fi;
 
     if [ ! -f ${EXECUTABLE} ]; then
-        ${superuser} ln -s $(pwd)/create_project.sh ${EXECUTABLE}
+        ${superuser} ln -s "$(pwd)"/create_project.sh ${EXECUTABLE}
         echo -e "${YELLOW}create-project is now available globally${NC}"
     fi
 }
@@ -206,7 +211,7 @@ do
         ;;
     esac
 done
-shift "$(($OPTIND -1))"
+shift "$((OPTIND - 1))"
 
 make_globally_available
 
