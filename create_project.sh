@@ -71,7 +71,8 @@ set_gtest()
         cp -r "${SCRIPT_PATH}"/templates/gtest/.github* .github/
 
         printf '%s\n' '' \
-            '[![Build and Run](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/actions/workflows/test.yml/badge.svg)](https://github.com/'${GH_USER}'/'${PROJECT_NAME}'/actions/workflows/test.yml)' \
+            '[![Test](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/actions/workflows/test.yml/badge.svg)](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/actions/workflows/test.yml)' \
+            '[![Coverage](https://img.shields.io/codecov/c/github/'"${GH_USER}"'/'"${PROJECT_NAME}"')](https://codecov.io/github/'"${GH_USER}"'/'"${PROJECT_NAME}"')' \
             >> README.md
     fi
 }
@@ -93,6 +94,10 @@ create_release_package()
 
     if [ "${PUSH_TO_REMOTE}" = "yes" ]; then
         cp -r "${SCRIPT_PATH}"/templates/package/.github/* .github/
+
+        printf '%s\n' \
+            '[![Release](https://img.shields.io/github/v/release/'"${GH_USER}"'/'"${PROJECT_NAME}"'.svg)](https://github.com/'"${GH_USER}"'/'"${PROJECT_NAME}"'/releases/latest)' \
+            >> README.md
     fi
 }
 
