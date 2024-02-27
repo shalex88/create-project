@@ -13,8 +13,9 @@ usage()
     echo "-g - init git repository & push to GitHub"
     echo "-r - add release package support"
     echo "-e - open in VSCode editor"
+    echo "-v - add vcpkg support"
     echo "example:"
-    echo "create-project -n test_project -p . -l cpp -tuge"
+    echo "create-project -n test-project -p . -l cpp -vtue"
 }
 
 uml()
@@ -56,6 +57,17 @@ language()
     OLD_PATTERN="@${PROJ_LANGUAGE}@"
     NEW_PATTERN="${PROJECT_NAME}"
     find . -type f -exec sed -i 's/'"$OLD_PATTERN"'/'"$NEW_PATTERN"'/g' {} \;
+}
+
+setup_vcpkg()
+{
+    mkdir -p cmake
+    cp -r "${SCRIPT_PATH}"/templates/vcpkg/* .
+
+    printf '%s\n' \
+        'include(cmake/EnableVcpkg.cmake)' \
+        | cat - CMakeLists.txt \
+        > temp && mv temp CMakeLists.txt
 }
 
 set_gtest()
@@ -128,6 +140,10 @@ create_project()
         create_release_package
     fi
 
+    if [ "${VCPKG}" = "yes" ]; then
+        setup_vcpkg
+    fi
+
     echo -e "${YELLOW}Project created${NC}"
 }
 
@@ -170,7 +186,7 @@ L_RED='\033[0;91m'
 NC='\033[0m'
 SCRIPT_PATH="$(dirname "$( readlink -f "$0" )")"
 
-while getopts "n:l:p:tgrueh" OPTION;
+while getopts "n:l:p:tgruevh" OPTION;
 do
     case ${OPTION} in
     n)
@@ -193,6 +209,9 @@ do
         ;;
     u)
         UML="yes"
+        ;;
+    v)
+        VCPKG="yes"
         ;;
     e)
         if [ -z "$(command -v code)" ]; then
