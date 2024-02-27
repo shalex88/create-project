@@ -10,6 +10,7 @@
 - Create a release package with CPack
 - Upload to GitHub
 - Add GitHub Actions for CI
+- Add vcpkg library manager support
 
 ## Setup
 
@@ -25,12 +26,13 @@
     -h - help
     -n <value> - project name
     -l <c|cpp> - template project language
-    -p <value> - project parent directory absolute path
+    -p <value> - project parent directory absolute path. default: current dir
     -t - add googletest framework for cpp
     -u - add PlantUML template
     -g - init git repository & push to GitHub
     -r - add release package support
     -e - open in VSCode editor
+    -v - add vcpkg support
     example:
-    create-project -n test_project -p . -l cpp -tuge
+    create-project -n test-project -p . -l cpp -vtu
 ```
