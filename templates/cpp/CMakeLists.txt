@@ -3,7 +3,7 @@ project(@cpp@ LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(include)
+include_directories(include source)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "source/*.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
