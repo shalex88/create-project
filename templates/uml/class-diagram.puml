@@ -2,6 +2,10 @@
 'https://plantuml.com/class-diagram
 skinparam classAttributeIconSize 0
 
+header
+    @uml@ - Class Diagram
+endheader
+
 'Classes
 
 'Relations

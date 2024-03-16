@@ -1,6 +1,10 @@
 @startuml @uml@-activity-diagram
 'https://plantuml.com/activity-diagram-beta
 
+header
+    @uml@ - Activity Diagram
+endheader
+
 start
 stop
 
