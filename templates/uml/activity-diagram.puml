@@ -1,0 +1,7 @@
+@startuml @uml@-activity-diagram
+'https://plantuml.com/activity-diagram-beta
+
+start
+stop
+
+@enduml

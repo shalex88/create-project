@@ -21,7 +21,7 @@ usage()
 uml()
 {
     mkdir -p docs
-    cp -r "${SCRIPT_PATH}"/templates/uml/uml.puml docs/"${PROJECT_NAME}".puml
+    cp -r "${SCRIPT_PATH}"/templates/uml/* docs/
 
     OLD_PATTERN="@uml@"
     NEW_PATTERN="${PROJECT_NAME}"
