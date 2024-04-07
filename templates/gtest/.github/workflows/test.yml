@@ -26,13 +26,13 @@ jobs:
 
       - name: Build
         run: |
-          cmake --build build --target ${{ env.PROJECT_NAME }}_test
+          cmake --build build --target ${{ env.PROJECT_NAME }}-tests
 
       - name: Test
         run: cd ./build/$sub_project && ./$bin
         env:
           sub_project: tests
-          bin: ${{ env.PROJECT_NAME }}_test
+          bin: ${{ env.PROJECT_NAME }}-tests
 
       - name: Create coverage reports
         if: github.event_name == 'push'
