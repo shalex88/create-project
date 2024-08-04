@@ -4,7 +4,7 @@
 
 - Create new project directory
 - Initialize git
-- Create template project for C/C++ with CMake support
+- Create template project for C++/Rust with CMake support
 - Create template for PlantUML
 - Create template test code with googletest framework
 - Create a release package with CPack
@@ -25,7 +25,7 @@
     options:
     -h - help
     -n <value> - project name
-    -l <c|cpp> - template project language
+    -l <cpp|rust> - template project language
     -p <value> - project parent directory absolute path. default: current dir
     -t - add googletest framework for cpp
     -u - add PlantUML template
