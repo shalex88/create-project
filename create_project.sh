@@ -68,10 +68,11 @@ setup_vcpkg()
     mkdir -p cmake
     cp -r "${SCRIPT_PATH}"/templates/vcpkg/* .
 
-    printf '%s\n' \
-        'include(cmake/EnableVcpkg.cmake)' \
-        | cat - CMakeLists.txt \
-        > temp && mv temp CMakeLists.txt
+    OLD_PATTERN="@${PROJ_LANGUAGE}@"
+    NEW_PATTERN="${PROJECT_NAME}"
+    find . -type f -exec sed -i 's/'"$OLD_PATTERN"'/'"$NEW_PATTERN"'/g' {} \;
+
+    sed -i '/^cmake_minimum_required(/i include(cmake/EnableVcpkg.cmake)' CMakeLists.txt
 }
 
 set_gtest()

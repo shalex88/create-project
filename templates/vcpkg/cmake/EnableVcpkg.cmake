@@ -1,4 +1,10 @@
 # Should be included only from the top level cmake and before project()
+configure_file(
+        ${CMAKE_SOURCE_DIR}/vcpkg.json.in
+        ${CMAKE_SOURCE_DIR}/vcpkg.json
+        @ONLY
+)
+
 include(FetchContent)
 FetchContent_Declare(
     vcpkg

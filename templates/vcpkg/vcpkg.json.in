@@ -1,0 +1,6 @@
+{
+  "name": "@cpp@",
+  "version": "@VERSION@",
+  "dependencies": [
+  ]
+}
