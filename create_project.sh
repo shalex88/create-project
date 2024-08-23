@@ -6,7 +6,7 @@ usage()
     echo "options:"
     echo "-h - help"
     echo "-n <value> - project name"
-    echo "-l <c|cpp> - template project language"
+    echo "-l <rust|cpp> - template project language"
     echo "-p <value> - project parent directory absolute path. default: current dir"
     echo "-t - add googletest framework for cpp"
     echo "-u - add PlantUML template"
@@ -15,7 +15,7 @@ usage()
     echo "-e - open in VSCode editor"
     echo "-v - add vcpkg support"
     echo "example:"
-    echo "create-project -n test-project -p . -l cpp -vtue"
+    echo "create-project -n test-project -p . -l cpp -gvtue"
 }
 
 uml()
@@ -30,7 +30,11 @@ uml()
 
 init_git()
 {
-    cp "${SCRIPT_PATH}"/templates/gitignore .gitignore
+    mv gitignore .gitignore
+
+    if [ -d "github" ]; then
+        mv github .github
+    fi
 
     git init
     git add .
@@ -243,7 +247,7 @@ if [ -z "${PROJ_LANGUAGE}" ]; then
     echo -e "Specify a project language:"
     read -r PROJ_LANGUAGE
 
-    if [ "${PROJ_LANGUAGE}" != "c" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
+    if [ "${PROJ_LANGUAGE}" != "rust" ] && [ "${PROJ_LANGUAGE}" != "cpp" ]; then
         echo -e "${RED}Error: Language is not supported${NC}"
         usage
         exit 1
@@ -274,3 +278,5 @@ fi
 if [ -n "${EDITOR}" ]; then
     code "${PATH_TO_REPO}/${PROJECT_NAME}"
 fi
+
+echo -e "${YELLOW}Finished${NC}"
