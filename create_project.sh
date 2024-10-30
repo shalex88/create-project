@@ -105,7 +105,8 @@ create_release_package()
     sed -i '/'"$OLD_PATTERN"'/c\'"$NEW_PATTERN" "CMakeLists.txt"
 
     printf '%s\n' '' \
-        'install(TARGETS ${PROJECT_NAME} DESTINATION bin)' \
+        'include(GNUInstallDirs)' \
+        'install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})' \
         'include(cmake/CreatePackage.cmake)' \
         >> CMakeLists.txt
 
