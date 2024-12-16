@@ -2,6 +2,8 @@ include(cmake/SetVersion.cmake)
 cmake_minimum_required(VERSION 3.22)
 project(@cpp@ LANGUAGES CXX VERSION ${VERSION})
 
+add_compile_definitions(APP_NAME="${PROJECT_NAME}")
+
 set(CMAKE_CXX_STANDARD 20)
 
 set(SOURCE_DIR "source")
