@@ -1,6 +1,7 @@
+set(PROJECT_NAME @cpp@)
 include(cmake/SetVersion.cmake)
 cmake_minimum_required(VERSION 3.22)
-project(@cpp@ LANGUAGES CXX VERSION ${VERSION})
+project(${PROJECT_NAME} LANGUAGES CXX VERSION ${VERSION})
 
 add_compile_definitions(APP_NAME="${PROJECT_NAME}")
 

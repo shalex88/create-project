@@ -1,5 +1,5 @@
 {
-  "name": "@cpp@",
+  "name": "@PROJECT_NAME@",
   "version": "@VERSION@",
   "dependencies": [
   ]
