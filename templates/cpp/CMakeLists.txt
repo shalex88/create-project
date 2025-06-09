@@ -7,7 +7,7 @@ add_compile_definitions(APP_NAME="${PROJECT_NAME}")
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(SOURCE_DIR "source")
+set(SOURCE_DIR "src")
 set(INCLUDE_DIR "include")
 
 include_directories(${INCLUDE_DIR} ${SOURCE_DIR})
