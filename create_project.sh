@@ -101,7 +101,7 @@ create_release_package()
     sed -i 's/std::endl;/" " << APP_VERSION_MAJOR << "." << APP_VERSION_MINOR << "." << APP_VERSION_PATCH << std::endl;/g' source/main.cpp
 
     OLD_PATTERN="^project("
-    NEW_PATTERN="include(cmake/SetVersion.cmake)\\nproject(${PROJECT_NAME} LANGUAGES CXX VERSION "'${VERSION}'")"
+    NEW_PATTERN="project(${PROJECT_NAME} LANGUAGES CXX VERSION "'${VERSION}'")"
     sed -i '/'"$OLD_PATTERN"'/c\'"$NEW_PATTERN" "CMakeLists.txt"
 
     printf '%s\n' '' \
