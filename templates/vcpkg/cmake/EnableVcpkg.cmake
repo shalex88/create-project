@@ -1,4 +1,7 @@
 # Should be included only from the top level cmake and before project()
+set(VCPKG_TARGET_TRIPLET x64-linux-release CACHE STRING "")
+set(VCPKG_HOST_TRIPLET x64-linux-release CACHE STRING "")
+
 configure_file(
         ${CMAKE_SOURCE_DIR}/vcpkg.json.in
         ${CMAKE_SOURCE_DIR}/vcpkg.json
